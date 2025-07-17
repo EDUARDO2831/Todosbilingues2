@@ -1,46 +1,30 @@
-// Importa los paquetes que instalamos
 import express from 'express';
 import cors from 'cors';
 import OpenAI from 'openai';
 
-// Inicia la aplicación del servidor
 const app = express();
 app.use(express.json());
-app.use(cors()); // Permite que tu frontend se comunique con este backend
+app.use(cors());
 
-// Configura OpenAI con la API Key que guardaremos en Vercel
-// process.env.OPENAI_API_KEY es la forma segura de leer un secreto
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, 
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Define la ruta (endpoint) que tu frontend llamará.
-// Por ejemplo: https://tu-app.vercel.app/api
 app.post('/api', async (req, res) => {
-  const { userText } = req.body; // Recibe el texto del usuario desde el frontend
+  const { userText } = req.body;
 
   try {
-    const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [
-            {
-                role: "system",
-                content: `Eres un evaluador de inglés. Evalúa las siguientes frases de un estudiante. Las frases deben ser positivas, lógicas y usar la estructura "Objective + Indicator + Description". Aprueba si al menos el 85% son correctas. Responde únicamente con la palabra "aprobado" o "reprobado".`
-            },
-            {
-                role: "user",
-                content: userText
-            }
-        ]
+    const response = await openai.responses.create({
+      prompt: {
+        id: "pmpt_68788e123e608193bd7fead6cc978bf8044a39b777673cab",
+        version: "1"
+      },
+      input: { userText }
     });
 
-    const decision = response.choices[0].message.content;
-    res.json({ result: decision }); // Envía el resultado de vuelta al frontend
-
+    res.json({ result: response.response }); // Asume que la API devuelve así
   } catch (error) {
-    res.status(500).json({ error: 'Error al contactar la IA' });
+    console.error("Error:", error);
+    res.status(500).json({ error: 'Error al contactar la IA personalizada' });
   }
 });
 
-// Exporta la app para que Vercel la pueda usar
 export default app;
