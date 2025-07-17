@@ -1,6 +1,6 @@
-import express from 'express';
-import cors from 'cors';
-import OpenAI from 'openai';
+const express = require('express');
+const cors = require('cors');
+const OpenAI = require('openai');
 
 const app = express();
 app.use(express.json());
@@ -15,16 +15,16 @@ app.post('/api', async (req, res) => {
     const response = await openai.responses.create({
       prompt: {
         id: "pmpt_68788e123e608193bd7fead6cc978bf8044a39b777673cab",
-        version: "1"
+        version: "2"
       },
       input: { userText }
     });
 
-    res.json({ result: response.response }); // Asume que la API devuelve así
+    res.json({ result: response.response });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error al contactar la IA personalizada:", error);
     res.status(500).json({ error: 'Error al contactar la IA personalizada' });
   }
 });
 
-export default app;
+module.exports = app;
